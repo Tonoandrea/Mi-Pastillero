@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mi Pastillero por Toño Andrea</title>
+<style>
+/* ===== Colores (tokens) · alto contraste ===== */
+:root{
+  --bg:#f6f4ee; --card:#ffffff; --ink:#14181f; --muted:#3d4654; --line:#aeb6c2;
+  --brand:#0b4f8a; --brand-ink:#ffffff; --ok:#0a6b2d; --ok-bg:#dff3e5;
+  --bad:#b00020; --bad-bg:#fde7ea; --warn:#8a5a00; --warn-bg:#fff1cf;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#10141b; --card:#1b212b; --ink:#f4f6f9; --muted:#c3cad6; --line:#586275;
+    --brand:#7cc0ff; --brand-ink:#08121f; --ok:#7be29c; --ok-bg:#12331f;
+    --bad:#ff8a9b; --bad-bg:#3a141b; --warn:#ffd27a; --warn-bg:#3a2d10;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#10141b; --card:#1b212b; --ink:#f4f6f9; --muted:#c3cad6; --line:#586275;
+  --brand:#7cc0ff; --brand-ink:#08121f; --ok:#7be29c; --ok-bg:#12331f;
+  --bad:#ff8a9b; --bad-bg:#3a141b; --warn:#ffd27a; --warn-bg:#3a2d10;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:20px/1.5 "Atkinson Hyperlegible","Verdana","Segoe UI",Arial,sans-serif}
+main{max-width:1200px;margin:0 auto;padding:16px 16px 48px}
+h1{font-size:2rem;margin:.2em 0}
+h2{font-size:1.6rem;margin:.4em 0}
+h3{font-size:1.25rem;margin:0}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:4px solid var(--brand);outline-offset:3px}
+
+/* ===== Cabecera y pestañas ===== */
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.tabs{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 20px}
+.tab{flex:1 1 150px;min-height:64px;padding:12px 16px;border:3px solid var(--brand);
+  background:var(--card);color:var(--brand);border-radius:16px;font-weight:700;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--brand);color:var(--brand-ink)}
+.theme{min-height:48px;padding:8px 14px;border:2px solid var(--line);background:var(--card);border-radius:12px;cursor:pointer}
+
+/* ===== Aviso general ===== */
+.banner{padding:16px 20px;border-radius:16px;font-weight:700;margin-bottom:16px;border:3px solid}
+.banner.bad{background:var(--bad-bg);color:var(--bad);border-color:var(--bad)}
+.banner.good{background:var(--ok-bg);color:var(--ok);border-color:var(--ok)}
+
+/* ===== Semana ===== */
+.weeknav{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:16px}
+.weeknav .title{flex:1 1 220px;font-size:1.25rem;font-weight:700;text-align:center}
+.btn{min-height:60px;padding:12px 22px;border-radius:14px;border:3px solid var(--brand);
+  background:var(--card);color:var(--brand);font-weight:700;cursor:pointer}
+.btn.primary{background:var(--brand);color:var(--brand-ink)}
+.btn.danger{border-color:var(--bad);color:var(--bad)}
+.week{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+.day{background:var(--card);border:3px solid var(--line);border-radius:18px;padding:14px}
+.day.today{border-color:var(--brand)}
+.day h3 .hoy{font-size:.85rem;background:var(--brand);color:var(--brand-ink);padding:2px 10px;border-radius:99px;margin-left:8px}
+.slot{margin-top:12px}
+.slot>h4{margin:0 0 6px;font-size:1.05rem;color:var(--muted)}
+.dose{border:3px solid var(--line);border-left-width:16px;border-radius:14px;padding:10px 12px;margin-bottom:10px;background:var(--bg)}
+.dose .nm{font-weight:700}
+.dose .ds{color:var(--muted);font-size:1rem}
+.dose.late{border-color:var(--bad);background:var(--bad-bg);animation:pulse 1.8s ease-in-out infinite}
+.dose.done{background:var(--ok-bg);border-color:var(--ok)}
+.tag{display:inline-block;font-weight:700;font-size:1rem;margin:4px 0}
+.late .tag{color:var(--bad)} .done .tag{color:var(--ok)} .wait .tag{color:var(--muted)}
+.take{width:100%;min-height:60px;margin-top:6px;border-radius:12px;border:3px solid var(--ok);
+  background:var(--card);color:var(--ok);font-weight:700;cursor:pointer}
+.done .take{background:var(--ok);color:var(--card)}
+@keyframes pulse{50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--bad) 35%,transparent)}}
+@media (prefers-reduced-motion:reduce){.dose.late{animation:none}}
+.empty{color:var(--muted);padding:6px 2px}
+
+/* ===== Formulario ===== */
+.panel{background:var(--card);border:3px solid var(--line);border-radius:18px;padding:20px;margin-bottom:20px}
+.field{margin-bottom:22px}
+label.l,.legend{display:block;font-weight:700;margin-bottom:8px}
+input[type=text],input[type=number],input[type=date],select{width:100%;min-height:60px;padding:10px 14px;
+  border:3px solid var(--line);border-radius:12px;background:var(--bg)}
+.row{display:flex;gap:12px;flex-wrap:wrap}.row>*{flex:1 1 140px}
+.checks{display:flex;gap:10px;flex-wrap:wrap}
+.check{flex:1 1 150px}
+.check input{position:absolute;opacity:0}
+.check span{display:flex;align-items:center;justify-content:center;gap:8px;min-height:64px;border:3px solid var(--line);
+  border-radius:14px;background:var(--bg);font-weight:700;cursor:pointer}
+.check input:checked+span{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.check input:focus-visible+span{outline:4px solid var(--brand);outline-offset:3px}
+.swatches{display:flex;gap:12px;flex-wrap:wrap}
+.sw input{position:absolute;opacity:0}
+.sw span{display:flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:50%;
+  border:4px solid var(--card);box-shadow:0 0 0 3px var(--line);color:#fff;font-size:1.8rem;font-weight:700;cursor:pointer}
+.sw input:checked+span{box-shadow:0 0 0 6px var(--ink)}
+.sw input:checked+span::after{content:"✔";text-shadow:0 0 3px #000}
+.sw input:disabled+span{opacity:.25;cursor:not-allowed}
+.sw input:focus-visible+span{outline:4px solid var(--brand);outline-offset:4px}
+.err{color:var(--bad);font-weight:700;min-height:1.5em}
+.medrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border:3px solid var(--line);border-left-width:16px;
+  border-radius:14px;padding:12px;margin-bottom:12px}
+.medrow .info{flex:1 1 220px}
+
+/* ===== Histórico ===== */
+.months{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.month{background:var(--card);border:3px solid var(--line);border-radius:18px;padding:16px}
+.bar{height:22px;border-radius:99px;background:var(--line);overflow:hidden;margin:10px 0}
+.bar i{display:block;height:100%}
+.g{background:var(--ok)} .a{background:var(--warn)} .r{background:var(--bad)}
+.pct{font-size:1.6rem;font-weight:700}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <h1>💊 Mi Pastillero por Toño Andrea</h1>
+  <button class="theme" id="themeBtn" type="button">🌙 Modo oscuro</button>
+</header>
+
+<div class="tabs" role="tablist" aria-label="Secciones">
+  <button class="tab" role="tab" id="t-week" aria-selected="true" data-tab="week">📅 Mi semana</button>
+  <button class="tab" role="tab" id="t-add" aria-selected="false" data-tab="add">➕ Añadir medicamento</button>
+  <button class="tab" role="tab" id="t-hist" aria-selected="false" data-tab="hist">📊 Histórico</button>
+</div>
+
+<!-- ========== SEMANA ========== -->
+<section id="week" aria-labelledby="t-week">
+  <div id="banner" aria-live="polite"></div>
+  <div class="weeknav">
+    <button class="btn" id="prev" type="button">◀ Anterior</button>
+    <div class="title" id="weekTitle"></div>
+    <button class="btn" id="next" type="button">Siguiente ▶</button>
+    <button class="btn primary" id="thisWeek" type="button">Hoy</button>
+  </div>
+  <div class="week" id="weekGrid"></div>
+</section>
+
+<!-- ========== AÑADIR ========== -->
+<section id="add" class="hidden" aria-labelledby="t-add">
+  <div class="panel">
+    <h2 id="formTitle">Nuevo medicamento</h2>
+    <div class="field"><label class="l" for="name">1. Nombre del medicamento</label>
+      <input type="text" id="name" placeholder="Ejemplo: Paracetamol" autocomplete="off"></div>
+    <div class="field"><label class="l" for="dose">2. Dosis</label>
+      <select id="dose">
+        <option>1 pastilla</option><option>2 pastillas</option><option>½ pastilla</option>
+        <option>1 cápsula</option><option>2 cápsulas</option><option>1 sobre</option>
+        <option>5 ml</option><option>10 ml</option><option>1 gota</option><option>3 gotas</option><option>1 inyección</option>
+      </select></div>
+    <div class="field"><div class="legend" id="lg-slots">3. ¿En qué momentos del día?</div>
+      <div class="checks" role="group" aria-labelledby="lg-slots">
+        <label class="check"><input type="checkbox" name="slot" value="m"><span>🌅 Mañana</span></label>
+        <label class="check"><input type="checkbox" name="slot" value="t"><span>☀️ Tarde</span></label>
+        <label class="check"><input type="checkbox" name="slot" value="n"><span>🌙 Noche</span></label>
+      </div></div>
+    <div class="field"><div class="legend">4. Duración del tratamiento</div>
+      <label class="check" style="display:block;margin-bottom:12px"><input type="checkbox" id="chronic"><span>♾️ Tratamiento crónico (sin fecha de fin)</span></label>
+      <div class="row">
+        <div><label class="l" for="dur">Cantidad</label><input type="number" id="dur" min="1" max="365" value="7" inputmode="numeric"></div>
+        <div><label class="l" for="unit">Unidad</label><select id="unit"><option value="d">días</option><option value="w">semanas</option></select></div>
+        <div><label class="l" for="start">Empieza el</label><input type="date" id="start"></div>
+      </div></div>
+    <div class="field"><div class="legend" id="lg-col">5. Color de la pastilla</div>
+      <div class="swatches" id="swatches" role="radiogroup" aria-labelledby="lg-col"></div></div>
+    <div class="err" id="err" role="alert"></div>
+    <button class="btn primary" id="save" type="button">💾 Guardar medicamento</button>
+    <button class="btn hidden" id="cancel" type="button">✖ Cancelar edición</button>
+  </div>
+  <div class="panel">
+    <h2>Mis medicamentos</h2>
+    <div id="medList"></div>
+  </div>
+</section>
+
+<!-- ========== HISTÓRICO ========== -->
+<section id="hist" class="hidden" aria-labelledby="t-hist">
+  <div class="panel">
+    <h2>Cumplimiento por meses</h2>
+    <label class="l" for="year">Elige el año</label>
+    <select id="year" style="max-width:260px"></select>
+  </div>
+  <div class="months" id="months"></div>
+</section>
+</main>
+
+<script>
+/* ===== Constantes ===== */
+const SLOTS=[{k:'m',n:'Mañana',h:9,i:'🌅'},{k:'t',n:'Tarde',h:15,i:'☀️'},{k:'n',n:'Noche',h:21,i:'🌙'}]; // hora de aviso
+const COLORS=[['#d62828','Rojo'],['#1d4ed8','Azul'],['#15803d','Verde'],['#b45309','Naranja'],['#7e22ce','Morado'],['#be185d','Rosa'],['#0e7490','Turquesa'],['#374151','Gris']];
+const DAYS=['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+const MONTHS=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const $=id=>document.getElementById(id);
+
+/* ===== Almacenamiento (localStorage protegido con try/catch) ===== */
+let mem={meds:[],logs:{}};
+function load(){try{const s=localStorage.getItem('pastillero');if(s)mem=JSON.parse(s)}catch(e){} }
+function save(){try{localStorage.setItem('pastillero',JSON.stringify(mem))}catch(e){} }
+load();
+
+/* ===== Utilidades de fechas ===== */
+const pad=n=>String(n).padStart(2,'0');
+const ymd=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parse=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function mondayOf(d){const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()-((x.getDay()+6)%7));return x}
+
+/* ¿La medicina toca ese día? */
+function active(m,ds){const s=parse(m.start),d=parse(ds);if(m.chronic)return d>=s; /* crónico: sin fecha de fin */ const e=addDays(s,m.days-1);return d>=s&&d<=e}
+/* Tomas previstas de un día: [{med,slot}] */
+function dosesOf(ds){const r=[];mem.meds.forEach(m=>{if(active(m,ds))SLOTS.forEach(s=>{if(m.slots.includes(s.k))r.push({m,s})})});return r}
+const key=(ds,id,k)=>`${ds}|${id}|${k}`;
+/* Estado: done / late / wait */
+function status(ds,m,s){
+  if(mem.logs[key(ds,m.id,s.k)])return 'done';
+  const due=parse(ds);due.setHours(s.h,0,0,0);
+  return new Date()>=due?'late':'wait';
+}
+
+/* ===== Pestañas ===== */
+let tab='week';
+function showTab(t){
+  tab=t;
+  ['week','add','hist'].forEach(x=>{
+    $(x).classList.toggle('hidden',x!==t);
+    $('t-'+x).setAttribute('aria-selected',x===t);
+  });
+  render();
+}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+
+/* ===== Semana ===== */
+let weekStart=mondayOf(new Date());
+$('prev').onclick=()=>{weekStart=addDays(weekStart,-7);renderWeek()};
+$('next').onclick=()=>{weekStart=addDays(weekStart,7);renderWeek()};
+$('thisWeek').onclick=()=>{weekStart=mondayOf(new Date());renderWeek()};
+
+function renderWeek(){
+  const end=addDays(weekStart,6), today=ymd(new Date());
+  $('weekTitle').textContent=`${weekStart.getDate()} ${MONTHS[weekStart.getMonth()]} – ${end.getDate()} ${MONTHS[end.getMonth()]} ${end.getFullYear()}`;
+
+  // Aviso general: tomas olvidadas en los últimos 7 días
+  let late=0;
+  for(let i=-7;i<=0;i++){const ds=ymd(addDays(new Date(),i));dosesOf(ds).forEach(({m,s})=>{if(status(ds,m,s)==='late')late++})}
+  $('banner').innerHTML=!mem.meds.length
+    ? '<div class="banner good">Todavía no hay medicamentos. Pulsa «➕ Añadir medicamento» para empezar.</div>'
+    : late ? `<div class="banner bad">⚠️ Tienes ${late} ${late===1?'toma pendiente':'tomas pendientes'}. Revisa los recuadros en rojo.</div>`
+           : '<div class="banner good">✅ Todo al día. ¡Muy bien!</div>';
+
+  let html='';
+  for(let i=0;i<7;i++){
+    const d=addDays(weekStart,i), ds=ymd(d), list=dosesOf(ds);
+    html+=`<article class="day ${ds===today?'today':''}"><h3>${DAYS[i]} ${d.getDate()}${ds===today?'<span class="hoy">Hoy</span>':''}</h3>`;
+    if(!list.length)html+='<p class="empty">Sin tomas</p>';
+    SLOTS.forEach(s=>{
+      const here=list.filter(x=>x.s.k===s.k);if(!here.length)return;
+      html+=`<div class="slot"><h4>${s.i} ${s.n} · ${s.h}:00</h4>`;
+      here.forEach(({m})=>{
+        const st=status(ds,m,s);
+        const tag=st==='done'?'✔ Tomada':st==='late'?'¡Pendiente!':'Aún no es la hora';
+        html+=`<div class="dose ${st}" style="border-left-color:${m.color}">
+          <div class="nm">${esc(m.name)}</div><div class="ds">${esc(m.dose)}</div>
+          <div class="tag">${tag}</div>
+          <button class="take" type="button" aria-pressed="${st==='done'}" data-k="${key(ds,m.id,s.k)}">
+            ${st==='done'?'✔ Tomado (pulsa para deshacer)':'Marcar como tomado'}</button></div>`;
+      });
+      html+='</div>';
+    });
+    html+='</article>';
+  }
+  $('weekGrid').innerHTML=html;
+  document.querySelectorAll('.take').forEach(b=>b.onclick=()=>{
+    const k=b.dataset.k; if(mem.logs[k])delete mem.logs[k]; else mem.logs[k]=1;
+    save();renderWeek();
+  });
+}
+
+/* ===== Formulario ===== */
+let editId=null; // id del medicamento que se está editando (null = nuevo)
+$('start').value=ymd(new Date());
+function renderSwatches(){
+  const used=mem.meds.filter(m=>m.id!==editId).map(m=>m.color), sel=document.querySelector('input[name=col]:checked')?.value;
+  $('swatches').innerHTML=COLORS.map(([c,n])=>`<label class="sw" title="${n}${used.includes(c)?' (en uso)':''}">
+    <input type="radio" name="col" value="${c}" aria-label="${n}" ${used.includes(c)?'disabled':''} ${sel===c?'checked':''}>
+    <span style="background:${c}"></span></label>`).join('');
+}
+$('save').onclick=()=>{
+  const name=$('name').value.trim(), slots=[...document.querySelectorAll('input[name=slot]:checked')].map(x=>x.value);
+  const col=document.querySelector('input[name=col]:checked')?.value, n=parseInt($('dur').value,10), chronic=$('chronic').checked;
+  let e='';
+  if(!name)e='Escribe el nombre del medicamento.';
+  else if(!slots.length)e='Elige al menos un momento del día.';
+  else if(!chronic&&(!n||n<1))e='Indica cuánto dura el tratamiento.';
+  else if(!$('start').value)e='Elige la fecha de inicio.';
+  else if(!col)e='Elige un color para esta pastilla.';
+  $('err').textContent=e; if(e)return;
+  const data={name,dose:$('dose').value,slots,color:col,start:$('start').value,chronic,days:chronic?null:($('unit').value==='w'?n*7:n)};
+  const wasEdit=!!editId;
+  if(wasEdit)Object.assign(mem.meds.find(x=>x.id===editId),data); // editar existente
+  else mem.meds.push({id:'m'+Date.now(),...data});            // añadir nuevo
+  save();resetForm();
+  $('err').textContent=wasEdit?'✔ Cambios guardados.':'✔ Medicamento guardado.';$('err').style.color='var(--ok)';
+  setTimeout(()=>{$('err').textContent='';$('err').style.color=''},3000);
+};
+function renderForm(){
+  renderSwatches();
+  $('medList').innerHTML=mem.meds.length?mem.meds.map(m=>{
+    const end=m.chronic?null:addDays(parse(m.start),m.days-1);
+    return `<div class="medrow" style="border-left-color:${m.color}"><div class="info"><strong>${esc(m.name)}</strong> · ${esc(m.dose)}<br>
+      ${SLOTS.filter(s=>m.slots.includes(s.k)).map(s=>s.i+' '+s.n).join(', ')}<br>
+      ${end?`Hasta el ${end.getDate()} ${MONTHS[end.getMonth()]} ${end.getFullYear()}`:'♾️ Tratamiento crónico (sin fecha de fin)'}</div>
+      <button class="btn" type="button" data-edit="${m.id}">✏️ Editar</button>
+      <button class="btn danger" type="button" data-del="${m.id}">🗑 Eliminar</button></div>`}).join('')
+    :'<p class="empty">Aún no has añadido ninguno.</p>';
+  document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>startEdit(b.dataset.edit));
+  document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{
+    const m=mem.meds.find(x=>x.id===b.dataset.del);
+    if(confirm(`¿Eliminar «${m.name}»? También se borrará su historial.`)){
+      if(editId===m.id)resetForm();
+      mem.meds=mem.meds.filter(x=>x.id!==m.id);
+      Object.keys(mem.logs).forEach(k=>{if(k.split('|')[1]===m.id)delete mem.logs[k]});
+      save();renderForm();
+    }
+  });
+}
+
+/* ===== Histórico ===== */
+/* ===== Editar un tratamiento ===== */
+function toggleChronic(){const c=$('chronic').checked;$('dur').disabled=c;$('unit').disabled=c;}
+$('chronic').onchange=toggleChronic;
+$('cancel').onclick=resetForm;
+
+// Deja el formulario vacío y en modo «Nuevo medicamento»
+function resetForm(){
+  editId=null;
+  document.querySelectorAll('input[name=col]').forEach(x=>x.checked=false);
+  $('name').value='';$('dose').selectedIndex=0;
+  document.querySelectorAll('input[name=slot]').forEach(x=>x.checked=false);
+  $('chronic').checked=false;$('dur').value=7;$('unit').value='d';$('start').value=ymd(new Date());
+  $('formTitle').textContent='Nuevo medicamento';$('save').textContent='💾 Guardar medicamento';
+  $('cancel').classList.add('hidden');$('err').textContent='';
+  toggleChronic();renderForm();
+}
+// Carga un medicamento en el formulario para modificarlo
+function startEdit(id){
+  const m=mem.meds.find(x=>x.id===id);if(!m)return;
+  editId=id;renderSwatches();
+  $('name').value=m.name;$('dose').value=m.dose;
+  document.querySelectorAll('input[name=slot]').forEach(x=>x.checked=m.slots.includes(x.value));
+  $('chronic').checked=!!m.chronic;
+  if(!m.chronic){const w=m.days%7===0;$('dur').value=w?m.days/7:m.days;$('unit').value=w?'w':'d';}
+  $('start').value=m.start;
+  document.querySelectorAll('input[name=col]').forEach(x=>x.checked=x.value===m.color);
+  $('formTitle').textContent='Editar: '+m.name;$('save').textContent='💾 Guardar cambios';
+  $('cancel').classList.remove('hidden');$('err').textContent='';
+  toggleChronic();$('formTitle').scrollIntoView({behavior:'smooth'});$('name').focus();
+}
+
+function renderHist(){
+  const nowY=new Date().getFullYear();
+  const first=mem.meds.length?Math.min(...mem.meds.map(m=>parse(m.start).getFullYear())):nowY;
+  const prev=parseInt($('year').value,10)||nowY;
+  $('year').innerHTML='';
+  for(let y=2026;y<=2030;y++) /* años visibles: del 2026 al 2030 */$('year').innerHTML+=`<option ${y===prev?'selected':''}>${y}</option>`;
+  const Y=parseInt($('year').value,10), now=new Date();
+  let html='';
+  for(let mo=0;mo<12;mo++){
+    let ok=0,miss=0,due=0,taken=0;
+    const dim=new Date(Y,mo+1,0).getDate();
+    for(let d=1;d<=dim;d++){
+      const ds=`${Y}-${pad(mo+1)}-${pad(d)}`, due1=dosesOf(ds).filter(({m,s})=>status(ds,m,s)!=='wait');
+      if(!due1.length)continue;
+      const t=due1.filter(({m,s})=>status(ds,m,s)==='done').length;
+      due+=due1.length;taken+=t; t===due1.length?ok++:miss++;
+    }
+    const p=due?Math.round(taken/due*100):0, cl=p>=90?'g':p>=70?'a':'r', lab=p>=90?'Excelente':p>=70?'Mejorable':'Hay que reforzar';
+    html+=`<article class="month"><h3>${MONTHS[mo]} ${Y}</h3>`+(due?
+      `<div class="pct">${p}%</div><div class="bar" role="img" aria-label="${p}% de tomas realizadas"><i class="${cl}" style="width:${p}%"></i></div>
+       <div><strong>${lab}</strong></div>
+       <div>✔ Días cumplidos: ${ok}</div><div>⚠️ Días con olvidos: ${miss}</div>
+       <div>Tomas: ${taken} de ${due}</div>`:'<p class="empty">Sin datos este mes</p>')+'</article>';
+  }
+  $('months').innerHTML=html;
+}
+$('year').onchange=renderHist;
+
+/* ===== Tema claro / oscuro ===== */
+$('themeBtn').onclick=()=>{
+  const dark=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()==='#10141b';
+  document.documentElement.dataset.theme=dark?'light':'dark';
+  $('themeBtn').textContent=dark?'🌙 Modo oscuro':'☀️ Modo claro';
+};
+
+/* ===== Pintado general ===== */
+function render(){ if(tab==='week')renderWeek(); if(tab==='add')renderForm(); if(tab==='hist')renderHist(); }
+render();
+setInterval(()=>{if(tab==='week')renderWeek()},60000); // refresca avisos cada minuto
+</script>
+</body>
+</html>
